@@ -1,0 +1,65 @@
+// style.ogs - verified LabTalk styling commands (Origin 2024, driven by COM)
+// Run inside Origin: Window > Script Window, paste, select all, Enter.
+// Anything marked BROKEN silently fails - do not reintroduce it.
+
+// ---------------------------------------------------------------------------
+// 1. Axis titles
+//    xb = bottom X, xt = top, yl = left, yr = right. There is no "yb".
+//    \+(...) superscript, \-(...) subscript, \g(W) omega.
+// ---------------------------------------------------------------------------
+xb.text$ = "Z' (\g(W)cm\+(2))";
+yl.text$ = "-Z'' (\g(W)cm\+(2))";
+
+// ---------------------------------------------------------------------------
+// 2. Title size and font
+//    layer.x.label.pt   -> axis title height in points (verified, 18 by default)
+//    layer.x.label.font -> font index (verified numeric property)
+//    Tick labels use layer.x.pt / layer.y.pt
+// ---------------------------------------------------------------------------
+layer.x.label.pt = 12;
+layer.y.label.pt = 12;
+layer.x.label.font = 2;      // 2 = Times New Roman on a default install
+layer.y.label.font = 2;
+layer.x.pt = 10;
+layer.y.pt = 10;
+
+// ---------------------------------------------------------------------------
+// 3. Square Nyquist plot
+//    Equal limits alone do not make the box square; the box size is a
+//    percentage of the page, so height% = width% * pageW / pageH.
+//    Default page on this install: page.width 6432, page.height 4923.
+// ---------------------------------------------------------------------------
+layer.x.from = 0;
+layer.x.to = 13500;
+layer.y.from = 0;
+layer.y.to = 13500;
+layer.left = 22;  layer.top = 8;
+layer.width = 60; layer.height = 78.4;   // 60 * 6432 / 4923
+
+// ---------------------------------------------------------------------------
+// 4. Legend
+//    Entries come from the Y column long names; refresh after plotting.
+// ---------------------------------------------------------------------------
+// wks.col2.lname$ = "191";
+legendupdate;
+
+// ---------------------------------------------------------------------------
+// 5. Export
+//    dpi:= is rejected in this version; resolution follows the page size.
+// ---------------------------------------------------------------------------
+expGraph type:=png path:="C:/out/" filename:="fig" tr1:=1;
+expGraph type:=tif path:="C:/out/" filename:="fig" tr1:=1;
+
+// ---------------------------------------------------------------------------
+// BROKEN in 2024 via COM - each returns True but does nothing, or errors
+// ---------------------------------------------------------------------------
+// xb.pts / xb.size / xb.fontsize        -> invalid property
+// layer.ratio = 1                       -> invalid property
+// page.width = 16                       -> accepted, value does not change
+// layer.plot1.color = color(255,0,0)    -> accepted, read-back unchanged
+// layer -i202 [Book]1!4                 -> adds nothing unless graph is active
+// expGraph ... dpi:=600                 -> False, no file written
+// saveas type:=otp / save -t            -> cannot write a template from LabTalk
+//
+// Consequence: templates must be saved once from the Origin GUI
+// (File > Save Template As), then reused with plot.ps1 -Template.
